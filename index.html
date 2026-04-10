@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Natasha Bot Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #131b34 0%, #070b16 55%, #04060d 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 0 30px rgba(0, 180, 255, 0.08);
+    }
+
+    .pulse-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #00ff9d;
+      box-shadow: 0 0 14px #00ff9d;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .grid-bg::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body class="text-white grid-bg">
+  <div class="max-w-7xl mx-auto p-4 md:p-8">
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl md:text-5xl font-bold tracking-wide">Natasha Dashboard</h1>
+        <p class="text-slate-400 mt-2">Live status monitor for your Telegram bot</p>
+      </div>
+
+      <div class="glass rounded-3xl px-5 py-4 flex items-center gap-3 w-fit">
+        <div class="pulse-dot"></div>
+        <div>
+          <div class="text-sm text-slate-400">Status</div>
+          <div id="connectionStatus" class="font-semibold text-green-400">Connecting...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass rounded-3xl p-5 mb-6">
+      <label class="block text-sm text-slate-400 mb-2">API URL</label>
+      <div class="flex flex-col md:flex-row gap-3">
+        <input id="apiUrl" type="text" class="flex-1 bg-slate-900/60 border border-slate-700 rounded-2xl px-4 py-3 outline-none" placeholder="https://your-render-url.onrender.com/status">
+        <button onclick="saveApiUrl()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-2xl px-6 py-3 transition">Connect</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+
+      <div class="glass rounded-3xl p-5">
+        <div class="text-slate-400 text-sm mb-2">Queue Size</div>
+        <div id="queueSize" class="text-4xl font-bold">0</div>
+      </div>
+
+      <div class="glass rounded-3xl p-5">
+        <div class="text-slate-400 text-sm mb-2">Last Delay</div>
+        <div id="lastDelay" class="text-4xl font-bold">--</div>
+        <div class="text-slate-500 text-sm mt-1">seconds</div>
+      </div>
+
+      <div class="glass rounded-3xl p-5">
+        <div class="text-slate-400 text-sm mb-2">Next Random Check</div>
+        <div id="nextCheck" class="text-2xl font-bold">--:--:--</div>
+      </div>
+
+      <div class="glass rounded-3xl p-5">
+        <div class="text-slate-400 text-sm mb-2">Auto Refresh</div>
+        <div class="text-2xl font-bold">5 sec</div>
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <div class="glass rounded-3xl p-6">
+        <h2 class="text-xl font-semibold mb-4">Last Received Message</h2>
+        <div id="lastReceived" class="space-y-2 text-slate-300">
+          Waiting for data...
+        </div>
+      </div>
+
+      <div class="glass rounded-3xl p-6">
+        <h2 class="text-xl font-semibold mb-4">Last Reply Sent</h2>
+        <div id="lastReply" class="space-y-2 text-slate-300">
+          Waiting for data...
+        </div>
+      </div>
+
+      <div class="glass rounded-3xl p-6">
+        <h2 class="text-xl font-semibold mb-4">Last Ignored Message</h2>
+        <div id="lastIgnored" class="space-y-2 text-slate-300">
+          Waiting for data...
+        </div>
+      </div>
+
+      <div class="glass rounded-3xl p-6">
+        <h2 class="text-xl font-semibold mb-4">Last Random Group Message</h2>
+        <div id="lastRandom" class="space-y-2 text-slate-300">
+          Waiting for data...
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const apiInput = document.getElementById('apiUrl');
+    const DEFAULT_API = 'https://telethonbotapiconnected.onrender.com/status';
+    const storedUrl = localStorage.getItem('natasha_api');
+
+    if (storedUrl) {
+      apiInput.value = storedUrl;
+    } else {
+      apiInput.value = DEFAULT_API;
+    }
+
+    function saveApiUrl() {
+      const url = apiInput.value.trim();
+      localStorage.setItem('natasha_api', url);
+      fetchData();
+    }
+
+    function renderBlock(target, data, emptyText = 'No data yet') {
+      const el = document.getElementById(target);
+
+      if (!data) {
+        el.innerHTML = `<div class="text-slate-500">${emptyText}</div>`;
+        return;
+      }
+
+      el.innerHTML = Object.entries(data)
+        .map(([key, value]) => `
+          <div class="flex justify-between gap-4 border-b border-slate-800 py-2">
+            <span class="text-slate-400 capitalize">${key.replace(/_/g, ' ')}</span>
+            <span class="text-right break-all">${value}</span>
+          </div>
+        `).join('');
+    }
+
+    async function fetchData() {
+      const url = apiInput.value.trim();
+      if (!url) return;
+
+      try {
+        const res = await fetch(url + '?t=' + Date.now());
+        const data = await res.json();
+
+        document.getElementById('connectionStatus').textContent = 'Online';
+        document.getElementById('connectionStatus').className = 'font-semibold text-green-400';
+
+        document.getElementById('queueSize').textContent = data.queue_size ?? 0;
+        document.getElementById('lastDelay').textContent = data.last_delay ?? '--';
+        document.getElementById('nextCheck').textContent = data.next_random_group_check ?? '--:--:--';
+
+        renderBlock('lastReceived', data.last_received);
+        renderBlock('lastReply', data.last_reply);
+        renderBlock('lastIgnored', data.last_ignored);
+        renderBlock('lastRandom', data.last_random_group_msg);
+
+      } catch (err) {
+        document.getElementById('connectionStatus').textContent = 'Offline';
+        document.getElementById('connectionStatus').className = 'font-semibold text-red-400';
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
+</body>
+</html>
