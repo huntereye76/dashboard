@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Natasha OS | Logic Debugger</title>
+  <title>Natasha OS | Debug Core (UTC &rarr; IST)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(circle at 0% 0%, #0f172a 0%, #020617 100%);
+      background: radial-gradient(circle at 0% 0%, #0c1121 0%, #030409 100%);
       min-height: 100vh;
-      color: #f1f5f9;
+      color: #e2e8f0;
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .glass-card {
-      background: rgba(30, 41, 59, 0.4);
+      background: rgba(30, 41, 59, 0.25);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
     }
     .status-pulse { animation: pulse-green 2s infinite; }
     @keyframes pulse-green {
@@ -26,71 +26,74 @@
       70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
       100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
-    .log-entry { border-left: 3px solid transparent; transition: all 0.2s; }
-    .log-entry:hover { border-left-color: #06b6d4; background: rgba(255,255,255,0.02); }
+    .log-entry { border-left: 2px solid transparent; }
+    .log-entry:hover { border-left-color: #06b6d4; background: rgba(255,255,255,0.01); }
   </style>
 </head>
-<body class="p-4 lg:p-10">
+<body class="p-3 lg:p-8">
 
-  <div class="max-w-[1600px] mx-auto">
-    <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
+  <div class="max-w-[1700px] mx-auto">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       <div>
-        <h1 class="text-4xl font-extrabold tracking-tighter text-white">NATASHA <span class="text-cyan-500 font-medium italic">OS</span></h1>
-        <div class="flex items-center gap-2 mt-1">
-            <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/20 uppercase">IST Sync Active</span>
-            <p class="text-slate-500 text-xs font-mono uppercase tracking-widest">Interaction & Logic Monitor</p>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white">NATASHA <span class="text-cyan-400 font-light italic">DEBUG</span></h1>
+        <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20 uppercase">UTC &rarr; IST</span>
+            <p class="text-slate-600 text-xs font-mono uppercase">Core Logic & Transaction Monitor</p>
         </div>
       </div>
 
-      <div class="glass-card px-5 py-3 flex items-center gap-4">
-        <div id="statusDot" class="h-2.5 w-2.5 rounded-full bg-green-500 status-pulse"></div>
-        <div class="pr-4 border-r border-white/10">
-          <div class="text-[10px] text-slate-500 font-bold uppercase">System</div>
+      <div class="glass-card px-4 py-2.5 flex items-center gap-3">
+        <div id="statusDot" class="h-2 w-2 rounded-full bg-green-500 status-pulse"></div>
+        <div class="pr-3 border-r border-white/5">
+          <div class="text-[9px] text-slate-500 font-bold uppercase">System</div>
           <div id="connectionStatus" class="text-xs font-bold text-green-400 font-mono">LIVE</div>
         </div>
         <div>
-          <div class="text-[10px] text-slate-500 font-bold uppercase">Local IST</div>
-          <div id="nodeClock" class="text-xs font-bold font-mono">--:--:--</div>
+          <div class="text-[9px] text-slate-500 font-bold uppercase">India Standard Time</div>
+          <div id="nodeClock" class="text-xs font-bold font-mono text-white">--:--:--</div>
         </div>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="glass-card p-6">
-        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Queue Depth</p>
-        <div id="queueSize" class="text-4xl font-bold font-mono">0</div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="glass-card p-5">
+        <p class="text-slate-500 text-[9px] font-bold uppercase mb-1.5">Queue Size</p>
+        <div id="queueSize" class="text-3xl font-bold font-mono">0</div>
       </div>
-      <div class="glass-card p-6">
-        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Process Latency</p>
-        <div class="flex items-baseline gap-2">
-          <span id="lastDelay" class="text-4xl font-bold font-mono text-purple-400">--</span>
-          <span class="text-slate-600 text-xs font-mono">ms</span>
+      <div class="glass-card p-5">
+        <p class="text-slate-500 text-[9px] font-bold uppercase mb-1.5">Processing Lag</p>
+        <div class="flex items-baseline gap-1.5">
+          <span id="lastDelay" class="text-3xl font-bold font-mono text-purple-400">--</span>
+          <span class="text-slate-700 text-xs font-mono">ms</span>
         </div>
       </div>
-      <div class="glass-card p-6">
-        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Next Trigger (IST)</p>
-        <div id="nextCheck" class="text-3xl font-bold font-mono text-orange-400">--:--:--</div>
+      <div class="glass-card p-5">
+        <p class="text-slate-500 text-[9px] font-bold uppercase mb-1.5">Next Auto-Trigger (IST)</p>
+        <div class="flex items-baseline gap-2">
+            <span id="nextCheck" class="text-2xl font-bold font-mono text-orange-400">--:--:--</span>
+            <span id="nextTriggerPercent" class="text-[10px] text-orange-500 font-mono"></span>
+        </div>
       </div>
-      <div class="glass-card p-6">
-        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Total Interactions</p>
-        <div id="totalInteractions" class="text-3xl font-bold font-mono text-green-400">0</div>
+      <div class="glass-card p-5 border border-cyan-500/10">
+        <p class="text-slate-500 text-[9px] font-bold uppercase mb-1.5">Total Interactions</p>
+        <div id="totalInteractions" class="text-3xl font-bold font-mono text-cyan-400">0</div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-2 glass-card flex flex-col h-[600px]">
-        <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-[20px]">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 glass-card flex flex-col h-[580px]">
+        <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.01] rounded-t-[16px]">
           <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Transaction History (IST)</h2>
-          <span class="text-[10px] text-slate-600 font-mono">Cached for 60m</span>
+          <span class="text-[10px] text-slate-700 font-mono">Synced</span>
         </div>
         <div id="activityLog" class="flex-1 overflow-y-auto p-2 space-y-1">
             </div>
       </div>
 
-      <div class="glass-card p-6 overflow-y-auto h-[600px]">
-        <h2 class="text-xs font-bold text-cyan-500 uppercase mb-6 tracking-widest border-b border-cyan-500/20 pb-2">Packet Inspector</h2>
+      <div class="glass-card p-5 overflow-y-auto h-[580px]">
+        <h2 class="text-xs font-bold text-cyan-500 uppercase mb-5 tracking-widest border-b border-cyan-500/10 pb-2">Debug Packet Inspector</h2>
         <div id="liveInspector" class="space-y-8">
-           <div class="text-slate-600 italic text-sm text-center py-20">Awaiting network handshake...</div>
+           <div class="text-slate-700 italic text-sm text-center py-16">Listening for data packets...</div>
         </div>
       </div>
     </div>
@@ -98,22 +101,33 @@
 
   <script>
     const API_URL = 'https://telethonbotapiconnected.onrender.com/status';
-    let history = JSON.parse(localStorage.getItem('natasha_v3_history')) || [];
+    const TRIGGER_PROBABILITY_PERCENT = "30"; // Assuming 0.3 logic from user input
+    let history = JSON.parse(localStorage.getItem('natasha_utc_sync_history')) || [];
     let interactionCount = history.length;
 
-    // Helper: Convert Server Time String to IST
-    function forceIST(timeStr) {
-      if (!timeStr || timeStr === "null") return "--:--:--";
+    // Time Normalization Engine (UTC HH:MM:SS -> IST HH:MM:SS AM/PM)
+    function normalizeUTCToIST(utcTimeStr) {
+      if (!utcTimeStr || utcTimeStr === "null") return "--:--:--";
       
-      // If server sends "HH:MM:SS", we create a date object for today
-      const today = new Date().toLocaleDateString('en-ZA'); // YYYY/MM/DD format
-      const dateObj = new Date(`${today} ${timeStr}`);
+      // Split the UTC time string
+      const [h, m, s] = utcTimeStr.split(':').map(Number);
       
+      // Create a Date object set to today at the UTC time
+      const utcDate = new Date();
+      utcDate.setUTCHours(h, m, s, 0);
+
+      // India is UTC + 5:30. Calculate the minutes to add.
+      const istMinutesToAdd = (5 * 60) + 30;
+      
+      // Create IST date by adding the offset
+      const istDate = new Date(utcDate.getTime() + istMinutesToAdd * 60000);
+
+      // Format for Indian output
       return new Intl.DateTimeFormat('en-IN', {
-        timeZone: 'Asia/Kolkata',
+        timeZone: 'Asia/Kolkata', // Keep explicitly Indian
         hour: '2-digit', minute: '2-digit', second: '2-digit',
         hour12: true
-      }).format(dateObj);
+      }).format(istDate);
     }
 
     function updateClock() {
@@ -128,22 +142,23 @@
     function saveEvent(data) {
       const now = Date.now();
       const currentMsg = data.last_received?.text || 'Heartbeat';
-      const currentTime = data.last_received?.time || '';
+      const utcTime = data.last_received?.time || '';
 
-      // Avoid duplicate logs if time/text is same as last
-      if (history.length > 0 && history[0].text === currentMsg && history[0].rawTime === currentTime) return;
+      // Prevent log duplicates
+      if (history.length > 0 && history[0].text === currentMsg && history[0].rawUtcTime === utcTime) return;
 
       history.unshift({
         recordedAt: now,
-        rawTime: currentTime,
+        rawUtcTime: utcTime,
+        istTimeString: normalizeUTCToIST(utcTime),
         sender: data.last_received?.user || 'SYSTEM',
         text: currentMsg,
         type: data.last_reply?.reply ? 'REPLY' : (data.last_ignored?.reason ? 'IGNORED' : 'RECEIVE'),
-        fullData: JSON.parse(JSON.stringify(data))
+        fullData: JSON.parse(JSON.stringify(data)) // deep copy
       });
 
-      if (history.length > 40) history.pop();
-      localStorage.setItem('natasha_v3_history', JSON.stringify(history));
+      if (history.length > 35) history.pop();
+      localStorage.setItem('natasha_utc_sync_history', JSON.stringify(history));
       interactionCount++;
       document.getElementById('totalInteractions').textContent = interactionCount;
       renderHistory();
@@ -151,16 +166,16 @@
 
     function renderHistory() {
       const container = document.getElementById('activityLog');
-      container.innerHTML = history.map((item, idx) => `
-        <div class="log-entry p-3 rounded-lg bg-white/[0.01] mb-1 flex justify-between items-center group">
-          <div class="flex items-center gap-4">
-            <div class="w-2 h-2 rounded-full ${item.type === 'REPLY' ? 'bg-green-500' : item.type === 'IGNORED' ? 'bg-orange-500' : 'bg-cyan-500'}"></div>
+      container.innerHTML = history.map((item) => `
+        <div class="log-entry p-3 rounded-xl bg-white/[0.01] flex justify-between items-center">
+          <div class="flex items-center gap-3.5">
+            <div class="w-1.5 h-1.5 rounded-full ${item.type === 'REPLY' ? 'bg-green-500' : item.type === 'IGNORED' ? 'bg-orange-500' : 'bg-cyan-500'}"></div>
             <div>
-              <div class="text-[10px] font-mono text-slate-500 uppercase">${item.type} | ID: ${item.sender}</div>
+              <div class="text-[9px] font-mono text-slate-600 uppercase tracking-tighter">${item.type} | NODE: ${item.sender}</div>
               <div class="text-sm text-slate-300 font-medium">${item.text}</div>
             </div>
           </div>
-          <div class="text-[10px] font-mono text-slate-600">${forceIST(item.rawTime)}</div>
+          <div class="text-[10px] font-mono text-slate-700">${item.istTimeString}</div>
         </div>
       `).join('');
     }
@@ -170,31 +185,45 @@
       const row = (label, val, color = "text-slate-300") => `
         <div class="flex justify-between py-1 border-b border-white/5 font-mono text-[11px]">
           <span class="text-slate-500">${label}</span>
-          <span class="${color} text-right ml-4">${val || '---'}</span>
+          <span class="${color} text-right ml-4 break-all">${val || '---'}</span>
         </div>`;
 
       container.innerHTML = `
         <section>
-          <h3 class="text-[10px] font-bold text-cyan-500 uppercase mb-3">Incoming Message</h3>
-          ${row('User ID', data.last_received?.user)}
-          ${row('Content', data.last_received?.text, 'text-white')}
-          ${row('Server Time', data.last_received?.time)}
-          ${row('IST Local', forceIST(data.last_received?.time), 'text-cyan-400')}
+          <h3 class="text-[9px] font-bold text-cyan-500 uppercase mb-2.5">Message Packet</h3>
+          ${row('Sender ID', data.last_received?.user)}
+          ${row('Payload', data.last_received?.text, 'text-white')}
+          ${row('API Clock (UTC)', data.last_received?.time)}
+          ${row('Synced (IST)', normalizeUTCToIST(data.last_received?.time), 'text-cyan-400')}
         </section>
 
         <section>
-          <h3 class="text-[10px] font-bold text-green-500 uppercase mb-3">Bot Interaction (Reply)</h3>
-          ${row('Trigger', data.last_reply?.original)}
+          <h3 class="text-[9px] font-bold text-green-500 uppercase mb-2.5">Interaction (Reply)</h3>
+          ${row('Trigger Msg', data.last_reply?.original)}
           ${row('Response', data.last_reply?.reply, 'text-green-400')}
-          ${row('Internal Delay', data.last_reply?.delay + 's')}
-          ${row('Sent At (IST)', forceIST(data.last_reply?.time), 'text-green-400')}
+          ${row('Response Delay', data.last_reply?.delay + 's')}
+          ${row('Sent At (IST)', normalizeUTCToIST(data.last_reply?.time), 'text-green-400')}
         </section>
 
         <section>
-          <h3 class="text-[10px] font-bold text-orange-500 uppercase mb-3">Filter Logic (Ignored)</h3>
+          <h3 class="text-[9px] font-bold text-orange-500 uppercase mb-2.5">Logic Gate (Filter)</h3>
           ${row('Reason', data.last_ignored?.reason, 'text-orange-400')}
           ${row('Text', data.last_ignored?.text)}
-          ${row('Time (IST)', forceIST(data.last_ignored?.time))}
+          ${row('UTC Server', data.last_ignored?.time)}
+          ${row('IST Sync', normalizeUTCToIST(data.last_ignored?.time))}
+        </section>
+
+        <section class="mt-4 p-3 rounded-lg bg-orange-500/5 border border-orange-500/10">
+            <h3 class="text-[9px] font-bold text-orange-400 uppercase tracking-wider mb-2">Automated Check Probability</h3>
+            <div class="flex justify-between font-mono text-sm">
+                <span class="text-slate-500">Scheduled Trigger</span>
+                <span class="text-orange-500">${normalizeUTCToIST(data.next_random_group_check)}</span>
+            </div>
+            <div class="flex justify-between font-mono text-sm mt-1">
+                <span class="text-slate-500">Send Message Chance</span>
+                <span class="text-cyan-400">${TRIGGER_PROBABILITY_PERCENT}% (0.3 limit)</span>
+            </div>
+        </div>
         </section>
       `;
     }
@@ -204,19 +233,20 @@
         const res = await fetch(`${API_URL}?t=${Date.now()}`);
         const data = await res.json();
 
-        // Update Global Stats
+        // Global Stats
         document.getElementById('queueSize').textContent = data.queue_size ?? 0;
         document.getElementById('lastDelay').textContent = data.last_delay ?? '--';
-        document.getElementById('nextCheck').textContent = forceIST(data.next_random_group_check);
+        document.getElementById('nextCheck').textContent = normalizeUTCToIST(data.next_random_group_check);
+        document.getElementById('nextTriggerPercent').textContent = `(${TRIGGER_PROBABILITY_PERCENT}%)`;
 
         saveEvent(data);
         updateInspector(data);
 
         document.getElementById('connectionStatus').textContent = 'LIVE';
-        document.getElementById('statusDot').className = 'h-2.5 w-2.5 rounded-full bg-green-500 status-pulse';
+        document.getElementById('statusDot').className = 'h-2 w-2 rounded-full bg-green-500 status-pulse';
       } catch (err) {
-        document.getElementById('connectionStatus').textContent = 'OFFLINE';
-        document.getElementById('statusDot').className = 'h-2.5 w-2.5 rounded-full bg-red-500';
+        document.getElementById('connectionStatus').textContent = 'LINK SEVERED';
+        document.getElementById('statusDot').className = 'h-2 w-2 rounded-full bg-red-500';
       }
     }
 
