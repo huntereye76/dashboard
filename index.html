@@ -1,301 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Natasha Bot Command Center</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(circle at top, #131b34 0%, #070b16 55%, #04060d 100%);
-      min-height: 100vh;
-      color: #e2e8f0;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 30px rgba(0, 180, 255, 0.05);
-    }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .pulse-dot {
-      width: 10px; height: 10px; border-radius: 999px;
-      background: #00ff9d; box-shadow: 0 0 14px #00ff9d;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .grid-bg::before {
-      content: ""; position: fixed; inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 40px 40px; pointer-events: none; z-index: -1;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natasha Bot Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #0a0f1d 0%, #02040a 100%);
+            font-family: 'Rajdhani', sans-serif;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(56, 189, 248, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+        .neon-text-blue { text-shadow: 0 0 10px rgba(56, 189, 248, 0.8); }
+        .neon-text-purple { text-shadow: 0 0 10px rgba(168, 85, 247, 0.8); }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        .pulse-online {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.1); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 10px; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="grid-bg p-4 md:p-8">
-  <div class="max-w-7xl mx-auto">
-    
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
-      <div>
-        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white">NATASHA <span class="text-cyan-400 font-light italic">OS</span></h1>
-        <p class="text-slate-400 mt-2 font-mono text-sm uppercase tracking-widest">Neural Link • IST Synchronized</p>
-      </div>
-      <div class="glass rounded-2xl px-6 py-4 flex items-center gap-4">
-        <div class="pulse-dot"></div>
+<body class="p-4 md:p-8">
+
+    <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
-          <div class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Engine Status</div>
-          <div id="connectionStatus" class="font-bold text-green-400 font-mono">LINK STABLE</div>
+            <h1 class="text-4xl font-bold orbitron neon-text-blue tracking-tighter">NATASHA BOT</h1>
+            <p class="text-cyan-400 font-medium tracking-widest text-sm uppercase">Live Telegram Bot Monitor</p>
         </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="glass rounded-3xl p-6">
-        <div class="text-slate-500 text-xs font-bold uppercase mb-2">Active Queue</div>
-        <div id="queueSize" class="text-4xl font-bold font-mono text-white">0</div>
-      </div>
-      <div class="glass rounded-3xl p-6">
-        <div class="text-slate-500 text-xs font-bold uppercase mb-2">Network Latency</div>
-        <div class="flex items-baseline gap-2">
-          <span id="lastDelay" class="text-4xl font-bold font-mono text-cyan-400">--</span>
-          <span class="text-slate-500 text-sm">sec</span>
+        <div class="flex items-center gap-4 glass-card px-6 py-3 rounded-full">
+            <div id="status-dot" class="w-3 h-3 rounded-full bg-gray-500"></div>
+            <span id="status-text" class="font-bold text-gray-400">CONNECTING...</span>
+            <div class="h-4 w-px bg-slate-700"></div>
+            <span class="text-xs text-slate-400">REFRESH: 5s</span>
         </div>
-      </div>
-      <div class="glass rounded-3xl p-6 relative overflow-hidden">
-        <div class="text-slate-500 text-xs font-bold uppercase mb-2">Next Trigger (IST)</div>
-        <div id="nextCheck" class="text-3xl font-bold font-mono text-orange-400">--:--:--</div>
-        <div id="countdown" class="text-[11px] font-mono text-slate-400 mt-2 italic">Waiting for signal...</div>
-      </div>
-      <div class="glass rounded-3xl p-6">
-        <div class="text-slate-500 text-xs font-bold uppercase mb-2">Session Clock</div>
-        <div id="istClock" class="text-3xl font-bold font-mono text-white">--:--:--</div>
-      </div>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-sm font-bold text-cyan-500 uppercase tracking-widest mb-6 border-b border-white/5 pb-2">Last Transmission</h2>
-        <div id="lastReceived" class="space-y-3"></div>
-      </div>
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-sm font-bold text-green-500 uppercase tracking-widest mb-6 border-b border-white/5 pb-2">Interaction Feedback</h2>
-        <div id="lastReply" class="space-y-3"></div>
-      </div>
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-sm font-bold text-orange-500 uppercase tracking-widest mb-6 border-b border-white/5 pb-2">Filtered / Ignored</h2>
-        <div id="lastIgnored" class="space-y-3"></div>
-      </div>
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-sm font-bold text-purple-500 uppercase tracking-widest mb-6 border-b border-white/5 pb-2">Random Pulse Check</h2>
-        <div id="lastRandom" class="space-y-3"></div>
-      </div>
-    </div>
+    <main class="max-w-7xl mx-auto space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-5 rounded-2xl">
+                <p class="text-slate-400 text-sm uppercase font-bold">Queue Size</p>
+                <p id="stat-queue" class="text-3xl font-bold orbitron neon-text-purple">0</p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl">
+                <p class="text-slate-400 text-sm uppercase font-bold">Last Delay</p>
+                <p id="stat-delay" class="text-3xl font-bold orbitron neon-text-blue">0<span class="text-sm ml-1">s</span></p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl">
+                <p class="text-slate-400 text-sm uppercase font-bold">Next Random Check</p>
+                <p id="stat-next-check" class="text-2xl font-bold orbitron text-cyan-300">--:--:--</p>
+            </div>
+            <div class="glass-card p-5 rounded-2xl flex flex-col justify-center">
+                <p class="text-slate-400 text-sm uppercase font-bold mb-1">Status</p>
+                <div id="countdown-timer" class="text-sm font-medium text-purple-400 italic">Initializing...</div>
+            </div>
+        </div>
 
-    <div class="glass rounded-3xl overflow-hidden mb-12">
-      <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Neural Logs (Last 20 Fetches)</h2>
-        <button onclick="clearLogs()" class="text-[10px] text-red-400/50 hover:text-red-400 uppercase font-bold">Purge Logs</button>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm font-mono">
-          <thead class="text-[10px] text-slate-500 uppercase border-b border-white/5">
-            <tr>
-              <th class="px-6 py-3">Fetch Time (IST)</th>
-              <th class="px-6 py-3">Queue</th>
-              <th class="px-6 py-3">Latest Msg</th>
-              <th class="px-6 py-3">Reply sent</th>
-              <th class="px-6 py-3">Next Trigger</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody" class="divide-y divide-white/5"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500">
+                <h3 class="orbitron text-blue-400 mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                    LAST RECEIVED MESSAGE
+                </h3>
+                <div id="card-received" class="space-y-3">
+                    <div class="bg-black/30 p-3 rounded-lg">
+                        <span class="text-xs text-slate-500 block uppercase">User ID</span>
+                        <p class="text-blue-300 font-mono" id="recv-user">No data</p>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded-lg">
+                        <span class="text-xs text-slate-500 block uppercase">Message</span>
+                        <p class="text-white italic" id="recv-text">No data</p>
+                    </div>
+                    <div class="text-right text-xs text-slate-500 font-bold" id="recv-time">--:--:--</div>
+                </div>
+            </div>
 
-  <script>
-    const API_URL = 'https://telethonbotapiconnected.onrender.com/status';
-    let lastKnownNextCheckUTC = "";
-    
-    // UI Label Mapping
-    const labelMap = {
-      'original': 'Original Message',
-      'reply': 'Bot Reply',
-      'time': 'Time (IST)',
-      'delay': 'Delay (sec)',
-      'user': 'User ID',
-      'chat_id': 'Group ID',
-      'text': 'Message Content',
-      'reason': 'Filter Reason',
-      'sender_name': 'Sender Name'
-    };
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-l-purple-500">
+                <h3 class="orbitron text-purple-400 mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                    LAST REPLY SENT
+                </h3>
+                <div id="card-reply" class="space-y-2">
+                    <div class="flex gap-4">
+                        <div class="flex-1 bg-black/30 p-2 rounded">
+                            <span class="text-[10px] text-slate-500 uppercase">Original</span>
+                            <p class="text-xs text-slate-300 truncate" id="reply-orig">No data</p>
+                        </div>
+                        <div class="flex-1 bg-black/30 p-2 rounded">
+                            <span class="text-[10px] text-slate-500 uppercase">Bot Reply</span>
+                            <p class="text-xs text-purple-300 truncate" id="reply-text">No data</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-2 px-1">
+                        <span class="text-xs text-slate-500 font-bold">Delay: <span id="reply-delay" class="text-purple-400">0s</span></span>
+                        <span class="text-xs text-slate-500 font-bold" id="reply-time">--:--:--</span>
+                    </div>
+                </div>
+            </div>
 
-    function normalizeUTCToIST(timeStr) {
-      if (!timeStr || timeStr === "null" || timeStr === "--:--:--") return "--:--:--";
-      const [h, m, s] = timeStr.split(':').map(Number);
-      const date = new Date();
-      date.setUTCHours(h, m, s, 0);
-      
-      return date.toLocaleTimeString('en-IN', {
-        timeZone: 'Asia/Kolkata',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        hour12: true
-      });
-    }
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-l-red-500">
+                <h3 class="orbitron text-red-400 mb-4">LAST IGNORED</h3>
+                <div class="bg-black/30 p-3 rounded-lg border border-red-900/30">
+                    <p class="text-red-300 text-sm font-bold mb-1" id="ignore-reason">No data</p>
+                    <p class="text-slate-400 text-xs italic truncate" id="ignore-text">No data</p>
+                    <p class="text-right text-[10px] text-slate-600 mt-2" id="ignore-time">--:--:--</p>
+                </div>
+            </div>
 
-    function getNowIST() {
-      return new Date().toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
-    }
+            <div class="glass-card p-6 rounded-2xl border-l-4 border-l-cyan-500">
+                <h3 class="orbitron text-cyan-400 mb-4">RANDOM GROUP ACTIVITY</h3>
+                <div class="bg-black/30 p-3 rounded-lg border border-cyan-900/30">
+                    <div class="flex justify-between items-start">
+                        <p class="text-cyan-200 text-sm font-mono" id="rand-group">No data</p>
+                        <span class="text-[10px] text-slate-500" id="rand-time">--:--:--</span>
+                    </div>
+                    <p class="text-slate-300 text-sm mt-2 italic" id="rand-msg">No data</p>
+                </div>
+            </div>
+        </div>
 
-    function updateClock() {
-      document.getElementById('istClock').textContent = new Date().toLocaleTimeString('en-IN', {
-        timeZone: 'Asia/Kolkata', hour12: true
-      });
-    }
+        <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="bg-slate-800/50 p-4 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="orbitron text-sm tracking-widest">LOG HISTORY (LAST 20)</h3>
+                <button onclick="clearHistory()" class="text-[10px] text-red-400 hover:text-red-300 uppercase font-bold transition">Clear Logs</button>
+            </div>
+            <div class="overflow-x-auto custom-scrollbar max-h-80 overflow-y-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-slate-900 z-10">
+                        <tr class="text-[10px] text-slate-500 uppercase border-b border-slate-800">
+                            <th class="p-4">Fetch Time (IST)</th>
+                            <th class="p-4">Q</th>
+                            <th class="p-4">Last Received</th>
+                            <th class="p-4">Last Reply</th>
+                            <th class="p-4">Next Check</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body" class="text-sm font-medium">
+                        </tbody>
+                </table>
+            </div>
+        </div>
 
-    function renderBlock(target, data) {
-      const el = document.getElementById(target);
-      if (!data || Object.keys(data).length === 0) {
-        el.innerHTML = `<div class="text-slate-600 italic font-mono text-xs">Awaiting data packet...</div>`;
-        return;
-      }
+        <div id="error-msg" class="hidden glass-card p-4 rounded-xl border-red-500/50 text-red-400 text-center font-bold animate-bounce">
+            ⚠️ CORS or API unavailable
+        </div>
+    </main>
 
-      el.innerHTML = Object.entries(data).map(([key, value]) => {
-        let displayValue = value === null ? "---" : value;
-        if (key === 'time') displayValue = normalizeUTCToIST(value);
-        if (key === 'delay') displayValue = `${value}s`;
-        
-        return `
-          <div class="flex justify-between items-start border-b border-white/5 py-2">
-            <span class="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">${labelMap[key] || key.replace(/_/g, ' ')}</span>
-            <span class="text-xs font-mono text-slate-200 text-right max-w-[70%] break-words">${displayValue}</span>
-          </div>
-        `;
-      }).join('');
-    }
+    <script>
+        const API_URL = 'https://telethonbotapiconnected.onrender.com/status';
+        let historyData = JSON.parse(localStorage.getItem('natasha_history') || '[]');
 
-    function handleCountdown(nextCheckIST) {
-      if (nextCheckIST === "--:--:--") return;
-      
-      const target = new Date(getNowIST());
-      const [time, modifier] = nextCheckIST.split(' ');
-      let [hours, minutes, seconds] = time.split(':').map(Number);
-      
-      if (modifier === 'PM' && hours < 12) hours += 12;
-      if (modifier === 'AM' && hours === 12) hours = 0;
-      
-      target.setHours(hours, minutes, seconds, 0);
-      
-      const now = new Date(getNowIST());
-      const diff = target - now;
-
-      const countdownEl = document.getElementById('countdown');
-      if (diff > 0) {
-        const m = Math.floor(diff / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        countdownEl.textContent = `Message may be sent in ${m}m ${s}s`;
-        countdownEl.className = "text-[11px] font-mono text-cyan-400 mt-2 italic";
-      } else {
-        countdownEl.textContent = "Waiting for next update...";
-        countdownEl.className = "text-[11px] font-mono text-slate-500 mt-2 italic";
-      }
-    }
-
-    function saveToHistory(data) {
-      let logs = JSON.parse(localStorage.getItem('natasha_logs') || '[]');
-      const entry = {
-        fetchTime: new Date().toLocaleTimeString('en-IN', {timeZone: 'Asia/Kolkata', hour12: true}),
-        queue: data.queue_size || 0,
-        lastMsg: data.last_received?.text || '---',
-        reply: data.last_reply?.reply || '---',
-        nextCheck: normalizeUTCToIST(data.next_random_group_check)
-      };
-      
-      logs.unshift(entry);
-      logs = logs.slice(0, 20);
-      localStorage.setItem('natasha_logs', JSON.stringify(logs));
-      renderHistory();
-    }
-
-    function renderHistory() {
-      const logs = JSON.parse(localStorage.getItem('natasha_logs') || '[]');
-      document.getElementById('historyBody').innerHTML = logs.map(log => `
-        <tr class="hover:bg-white/[0.02] transition">
-          <td class="px-6 py-4 text-cyan-500">${log.fetchTime}</td>
-          <td class="px-6 py-4">${log.queue}</td>
-          <td class="px-6 py-4 text-slate-400 truncate max-w-xs">${log.lastMsg}</td>
-          <td class="px-6 py-4 text-green-500 truncate max-w-xs">${log.reply}</td>
-          <td class="px-6 py-4 text-orange-400">${log.nextCheck}</td>
-        </tr>
-      `).join('');
-    }
-
-    function clearLogs() {
-      localStorage.removeItem('natasha_logs');
-      renderHistory();
-    }
-
-    async function fetchData() {
-      try {
-        const res = await fetch(`${API_URL}?t=${Date.now()}`);
-        const data = await res.json();
-
-        document.getElementById('connectionStatus').textContent = 'LINK STABLE';
-        document.getElementById('connectionStatus').className = 'font-bold text-green-400 font-mono';
-
-        // Queue & Delay
-        document.getElementById('queueSize').textContent = data.queue_size ?? 0;
-        document.getElementById('lastDelay').textContent = data.last_delay ?? '--';
-
-        // Next Check Persistent Logic
-        const currentUTC = data.next_random_group_check;
-        const istNow = new Date(getNowIST());
-        
-        if (currentUTC) {
-            const checkDate = new Date();
-            const [h,m,s] = currentUTC.split(':').map(Number);
-            checkDate.setUTCHours(h,m,s,0);
+        /**
+         * Converts UTC HH:MM:SS to IST 12-hour format
+         */
+        function utcToIST(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string') return 'N/A';
             
-            // If the API sends an old time, keep showing our previous valid one
-            if (checkDate > istNow || !lastKnownNextCheckUTC) {
-                lastKnownNextCheckUTC = currentUTC;
+            try {
+                const [hrs, mins, secs] = timeStr.split(':').map(Number);
+                const date = new Date();
+                date.setUTCHours(hrs, mins, secs);
+                
+                // Add IST offset (+5:30)
+                // Date object handles the overflow of hours/minutes automatically
+                return date.toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Kolkata'
+                });
+            } catch (e) {
+                return 'Invalid Time';
             }
         }
 
-        const nextIST = normalizeUTCToIST(lastKnownNextCheckUTC);
-        document.getElementById('nextCheck').textContent = nextIST;
-        handleCountdown(nextIST);
+        /**
+         * Calculates countdown for Next Random Check
+         */
+        function updateCountdown(targetUtcStr) {
+            const container = document.getElementById('countdown-timer');
+            if (!targetUtcStr) {
+                container.innerText = "No schedule found";
+                return;
+            }
 
-        // Render Message Cards
-        renderBlock('lastReceived', data.last_received);
-        renderBlock('lastReply', data.last_reply);
-        renderBlock('lastIgnored', data.last_ignored);
-        renderBlock('lastRandom', data.last_random_group_msg);
+            const now = new Date();
+            const target = new Date();
+            const [hrs, mins, secs] = targetUtcStr.split(':').map(Number);
+            target.setUTCHours(hrs, mins, secs);
 
-        saveToHistory(data);
-      } catch (err) {
-        document.getElementById('connectionStatus').textContent = 'LINK SEVERED';
-        document.getElementById('connectionStatus').className = 'font-bold text-red-500 font-mono';
-      }
-    }
+            // If target time is earlier today in UTC, it might be for tomorrow, 
+            // but for a monitor we usually care about the immediate future.
+            const diff = target - now;
 
-    // Initializations
-    setInterval(updateClock, 1000);
-    setInterval(fetchData, 5000);
-    setInterval(() => {
-        const nextIST = document.getElementById('nextCheck').textContent;
-        handleCountdown(nextIST);
-    }, 1000);
+            if (diff > 0) {
+                const m = Math.floor(diff / 1000 / 60);
+                const s = Math.floor((diff / 1000) % 60);
+                container.innerText = `Next random message may send in ${m}m ${s}s`;
+                container.classList.replace('text-red-400', 'text-purple-400');
+            } else {
+                container.innerText = "Waiting for next update...";
+                container.classList.replace('text-purple-400', 'text-red-400');
+            }
+        }
 
-    fetchData();
-    renderHistory();
-  </script>
+        async function fetchData() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network Error');
+                
+                const data = await response.json();
+                
+                // Update UI Status
+                document.getElementById('status-dot').className = 'w-3 h-3 rounded-full bg-green-500 pulse-online';
+                document.getElementById('status-text').innerText = 'ONLINE';
+                document.getElementById('status-text').className = 'font-bold text-green-400 neon-text-blue';
+                document.getElementById('error-msg').classList.add('hidden');
+
+                // Update Stats
+                document.getElementById('stat-queue').innerText = data.queue_size ?? 0;
+                document.getElementById('stat-delay').innerText = data.last_delay ?? 0;
+                document.getElementById('stat-next-check').innerText = utcToIST(data.next_random_group_check);
+
+                // Update Received Card
+                const recv = data.last_received || {};
+                document.getElementById('recv-user').innerText = recv.user || 'N/A';
+                document.getElementById('recv-text').innerText = recv.text || 'No data';
+                document.getElementById('recv-time').innerText = utcToIST(recv.time);
+
+                // Update Reply Card
+                const repl = data.last_reply || {};
+                document.getElementById('reply-orig').innerText = repl.original || 'No data';
+                document.getElementById('reply-text').innerText = repl.reply || 'No data';
+                document.getElementById('reply-delay').innerText = (repl.delay ?? 0) + 's';
+                document.getElementById('reply-time').innerText = utcToIST(repl.time);
+
+                // Update Ignored
+                const ign = data.last_ignored || {};
+                document.getElementById('ignore-reason').innerText = ign.reason || 'None';
+                document.getElementById('ignore-text').innerText = ign.text || 'N/A';
+                document.getElementById('ignore-time').innerText = utcToIST(ign.time);
+
+                // Update Random
+                const rnd = data.last_random_group_msg || {};
+                document.getElementById('rand-group').innerText = rnd.group || 'N/A';
+                document.getElementById('rand-msg').innerText = rnd.message || 'No messages';
+                document.getElementById('rand-time').innerText = utcToIST(rnd.time);
+
+                // Update Countdown
+                updateCountdown(data.next_random_group_check);
+
+                // Save to History
+                saveToHistory(data);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('status-dot').className = 'w-3 h-3 rounded-full bg-red-600';
+                document.getElementById('status-text').innerText = 'OFFLINE';
+                document.getElementById('status-text').className = 'font-bold text-red-500';
+                document.getElementById('error-msg').classList.remove('hidden');
+            }
+        }
+
+        function saveToHistory(data) {
+            const nowIST = new Date().toLocaleTimeString('en-IN', { hour12: true });
+            const entry = {
+                fetchTime: nowIST,
+                queue: data.queue_size,
+                recv: data.last_received?.text || 'None',
+                repl: data.last_reply?.reply || 'None',
+                next: utcToIST(data.next_random_group_check)
+            };
+
+            historyData.unshift(entry);
+            if (historyData.length > 20) historyData.pop();
+            
+            localStorage.setItem('natasha_history', JSON.stringify(historyData));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const body = document.getElementById('history-body');
+            body.innerHTML = historyData.map(row => `
+                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-colors fade-in">
+                    <td class="p-4 text-cyan-400 font-mono text-xs">${row.fetchTime}</td>
+                    <td class="p-4">${row.queue}</td>
+                    <td class="p-4 text-slate-300 truncate max-w-[150px]">${row.recv}</td>
+                    <td class="p-4 text-purple-300 truncate max-w-[150px]">${row.repl}</td>
+                    <td class="p-4 text-slate-500 font-mono text-xs">${row.next}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearHistory() {
+            historyData = [];
+            localStorage.removeItem('natasha_history');
+            renderHistory();
+        }
+
+        // Initialize
+        renderHistory();
+        fetchData();
+        setInterval(fetchData, 5000);
+    </script>
 </body>
 </html>
