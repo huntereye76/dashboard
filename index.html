@@ -1,130 +1,131 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Natasha Bot Dashboard</title>
+  <title>Natasha OS | Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      background: radial-gradient(circle at top, #131b34 0%, #070b16 55%, #04060d 100%);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 0% 0%, #1a1f35 0%, #05070a 100%);
       min-height: 100vh;
-      overflow-x: hidden;
+      color: #e2e8f0;
     }
 
-    .glass {
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 0 30px rgba(0, 180, 255, 0.08);
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      transition: all 0.3s ease;
     }
 
-    .pulse-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      background: #00ff9d;
-      box-shadow: 0 0 14px #00ff9d;
-      animation: pulse 1.5s infinite;
+    .glass-card:hover {
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      background: rgba(255, 255, 255, 0.05);
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
+    .stat-value {
+      background: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .grid-bg::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: -1;
+    .status-glow {
+      position: relative;
     }
+    .status-glow::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      background: inherit;
+      filter: blur(8px);
+      opacity: 0.5;
+      border-radius: inherit;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
   </style>
 </head>
-<body class="text-white grid-bg">
-  <div class="max-w-7xl mx-auto p-4 md:p-8">
+<body class="p-4 md:p-8">
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+  <div class="max-w-7xl mx-auto">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
       <div>
-        <h1 class="text-3xl md:text-5xl font-bold tracking-wide">Natasha Dashboard</h1>
-        <p class="text-slate-400 mt-2">Live status monitor for your Telegram bot</p>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="h-8 w-1 bg-cyan-500 rounded-full"></div>
+          <h1 class="text-3xl font-bold tracking-tight">NATASHA <span class="text-cyan-400 font-light">V3.0</span></h1>
+        </div>
+        <p class="text-slate-400 text-sm">System Intelligence & Message Routing (IST)</p>
       </div>
 
-      <div class="glass rounded-3xl px-5 py-4 flex items-center gap-3 w-fit">
-        <div class="pulse-dot"></div>
-        <div>
-          <div class="text-sm text-slate-400">Status</div>
-          <div id="connectionStatus" class="font-semibold text-green-400">Connecting...</div>
+      <div class="flex gap-4">
+        <div class="glass-card px-6 py-3 flex items-center gap-4">
+          <div id="statusDot" class="h-3 w-3 rounded-full bg-slate-500 status-glow"></div>
+          <div>
+            <div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">System Status</div>
+            <div id="connectionStatus" class="text-sm font-semibold">INITIALIZING</div>
+          </div>
         </div>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="glass-card p-6">
+        <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Active Queue</p>
+        <div id="queueSize" class="stat-value text-4xl font-bold">0</div>
+        <div class="mt-2 text-[10px] text-cyan-400/70 italic">Processing real-time</div>
+      </div>
+
+      <div class="glass-card p-6">
+        <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Response Latency</p>
+        <div class="flex items-baseline gap-2">
+          <span id="lastDelay" class="stat-value text-4xl font-bold">--</span>
+          <span class="text-slate-500 text-sm font-medium">sec</span>
+        </div>
+        <div class="mt-2 text-[10px] text-slate-500">Wait time for last trigger</div>
+      </div>
+
+      <div class="glass-card p-6">
+        <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Next Auto-Check</p>
+        <div id="nextCheck" class="stat-value text-2xl font-bold">--:--:--</div>
+        <div class="mt-3 w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+          <div class="bg-cyan-500 h-full w-1/3 shadow-[0_0_8px_#06b6d4]"></div>
+        </div>
+      </div>
+
+      <div class="glass-card p-6">
+        <p class="text-slate-400 text-xs uppercase tracking-wider font-semibold mb-2">Last Heartbeat</p>
+        <div id="lastHeartbeat" class="stat-value text-2xl font-bold">--:--:--</div>
+        <div class="mt-2 text-[10px] text-green-400/70 uppercase">Syncing every 5s</div>
       </div>
     </div>
 
-    <div class="glass rounded-3xl p-5 mb-6">
-      <label class="block text-sm text-slate-400 mb-2">API URL</label>
-      <div class="flex flex-col md:flex-row gap-3">
-        <input id="apiUrl" type="text" class="flex-1 bg-slate-900/60 border border-slate-700 rounded-2xl px-4 py-3 outline-none" placeholder="https://your-render-url.onrender.com/status">
-        <button onclick="saveApiUrl()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold rounded-2xl px-6 py-3 transition">Connect</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-
-      <div class="glass rounded-3xl p-5">
-        <div class="text-slate-400 text-sm mb-2">Queue Size</div>
-        <div id="queueSize" class="text-4xl font-bold">0</div>
-      </div>
-
-      <div class="glass rounded-3xl p-5">
-        <div class="text-slate-400 text-sm mb-2">Last Delay</div>
-        <div id="lastDelay" class="text-4xl font-bold">--</div>
-        <div class="text-slate-500 text-sm mt-1">seconds</div>
-      </div>
-
-      <div class="glass rounded-3xl p-5">
-        <div class="text-slate-400 text-sm mb-2">Next Random Check</div>
-        <div id="nextCheck" class="text-2xl font-bold">--:--:--</div>
-      </div>
-
-      <div class="glass rounded-3xl p-5">
-        <div class="text-slate-400 text-sm mb-2">Auto Refresh</div>
-        <div class="text-2xl font-bold">5 sec</div>
-      </div>
-
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Last Received Message</h2>
-        <div id="lastReceived" class="space-y-2 text-slate-300">
-          Waiting for data...
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <div class="lg:col-span-2 space-y-6">
+        <div class="glass-card overflow-hidden">
+          <div class="px-6 py-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+            <h3 class="font-semibold text-sm tracking-wide uppercase text-cyan-400">Recent Transmission History</h3>
+            <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">Stores for 1 Hour</span>
+          </div>
+          <div id="activityLog" class="p-0 max-h-[600px] overflow-y-auto">
+            <div class="p-10 text-center text-slate-600 italic">No activity detected yet...</div>
+          </div>
         </div>
       </div>
 
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Last Reply Sent</h2>
-        <div id="lastReply" class="space-y-2 text-slate-300">
-          Waiting for data...
-        </div>
-      </div>
-
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Last Ignored Message</h2>
-        <div id="lastIgnored" class="space-y-2 text-slate-300">
-          Waiting for data...
-        </div>
-      </div>
-
-      <div class="glass rounded-3xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Last Random Group Message</h2>
-        <div id="lastRandom" class="space-y-2 text-slate-300">
-          Waiting for data...
+      <div class="space-y-6">
+        <div class="glass-card p-6">
+          <h3 class="font-semibold text-sm mb-4 border-b border-white/5 pb-2 text-slate-400 uppercase">Live Snapshot</h3>
+          <div id="liveInspector" class="space-y-4 text-sm">
+             <div class="text-slate-500 italic">Select an event from the log to inspect details.</div>
+          </div>
         </div>
       </div>
 
@@ -132,67 +133,124 @@
   </div>
 
   <script>
-    const apiInput = document.getElementById('apiUrl');
-    const DEFAULT_API = 'https://telethonbotapiconnected.onrender.com/status';
-    const storedUrl = localStorage.getItem('natasha_api');
+    // CONFIGURATION (BACKEND)
+    const API_URL = 'https://telethonbotapiconnected.onrender.com/status';
+    const REFRESH_RATE = 5000; 
+    const HISTORY_EXPIRY_MS = 60 * 60 * 1000; // 1 Hour
 
-    if (storedUrl) {
-      apiInput.value = storedUrl;
-    } else {
-      apiInput.value = DEFAULT_API;
+    // Global State
+    let history = JSON.parse(localStorage.getItem('natasha_history')) || [];
+
+    function formatToIST(isoString) {
+      if (!isoString) return '--:--:--';
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('en-IN', { 
+        timeZone: 'Asia/Kolkata', 
+        hour12: true, 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
 
-    function saveApiUrl() {
-      const url = apiInput.value.trim();
-      localStorage.setItem('natasha_api', url);
-      fetchData();
-    }
+    function saveHistory(newData) {
+      const timestamp = new Date().getTime();
+      
+      // Clean old history (older than 1 hour)
+      history = history.filter(item => (timestamp - item.recordedAt) < HISTORY_EXPIRY_MS);
 
-    function renderBlock(target, data, emptyText = 'No data yet') {
-      const el = document.getElementById(target);
-
-      if (!data) {
-        el.innerHTML = `<div class="text-slate-500">${emptyText}</div>`;
-        return;
+      // Create a unique entry for this update if data has changed
+      const lastEntry = history[0];
+      if (!lastEntry || JSON.stringify(lastEntry.data.last_received) !== JSON.stringify(newData.last_received)) {
+        history.unshift({
+          recordedAt: timestamp,
+          data: newData
+        });
       }
 
-      el.innerHTML = Object.entries(data)
-        .map(([key, value]) => `
-          <div class="flex justify-between gap-4 border-b border-slate-800 py-2">
-            <span class="text-slate-400 capitalize">${key.replace(/_/g, ' ')}</span>
-            <span class="text-right break-all">${value}</span>
+      // Limit to last 20 entries
+      if (history.length > 20) history.pop();
+      
+      localStorage.setItem('natasha_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('activityLog');
+      if (history.length === 0) return;
+
+      container.innerHTML = history.map((item, idx) => `
+        <div class="group border-b border-white/5 p-4 hover:bg-white/[0.02] transition cursor-default">
+          <div class="flex justify-between items-start mb-1">
+            <span class="text-[10px] font-bold text-cyan-500 uppercase tracking-tighter">
+              ${item.data.last_received?.sender_name || 'System Update'}
+            </span>
+            <span class="text-[10px] text-slate-500">${formatToIST(item.recordedAt)}</span>
           </div>
-        `).join('');
+          <p class="text-sm text-slate-300 truncate">
+            ${item.data.last_received?.text || 'Heartbeat signal received'}
+          </p>
+        </div>
+      `).join('');
+    }
+
+    function updateLiveInspector(data) {
+      const container = document.getElementById('liveInspector');
+      const renderSection = (title, obj) => {
+        if(!obj) return '';
+        return `
+          <div class="mb-4">
+            <div class="text-[10px] text-cyan-500 font-bold uppercase mb-1">${title}</div>
+            ${Object.entries(obj).map(([k, v]) => `
+              <div class="flex justify-between py-1 border-b border-white/5 text-[12px]">
+                <span class="text-slate-500">${k.replace(/_/g, ' ')}</span>
+                <span class="text-slate-300 text-right font-mono">${v}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      };
+
+      container.innerHTML = `
+        ${renderSection('Last Incoming', data.last_received)}
+        ${renderSection('Last Reply', data.last_reply)}
+        ${renderSection('Ignored Content', data.last_ignored)}
+      `;
     }
 
     async function fetchData() {
-      const url = apiInput.value.trim();
-      if (!url) return;
-
       try {
-        const res = await fetch(url + '?t=' + Date.now());
+        const res = await fetch(`${API_URL}?t=${Date.now()}`);
         const data = await res.json();
 
-        document.getElementById('connectionStatus').textContent = 'Online';
-        document.getElementById('connectionStatus').className = 'font-semibold text-green-400';
+        // Update Header & Status
+        document.getElementById('connectionStatus').textContent = 'SYSTEM ONLINE';
+        document.getElementById('connectionStatus').className = 'text-sm font-semibold text-green-400';
+        document.getElementById('statusDot').className = 'h-3 w-3 rounded-full bg-green-500 status-glow';
 
+        // Update Stat Cards
         document.getElementById('queueSize').textContent = data.queue_size ?? 0;
         document.getElementById('lastDelay').textContent = data.last_delay ?? '--';
         document.getElementById('nextCheck').textContent = data.next_random_group_check ?? '--:--:--';
+        document.getElementById('lastHeartbeat').textContent = formatToIST(new Date());
 
-        renderBlock('lastReceived', data.last_received);
-        renderBlock('lastReply', data.last_reply);
-        renderBlock('lastIgnored', data.last_ignored);
-        renderBlock('lastRandom', data.last_random_group_msg);
+        // Process History and UI
+        saveHistory(data);
+        updateLiveInspector(data);
 
       } catch (err) {
-        document.getElementById('connectionStatus').textContent = 'Offline';
-        document.getElementById('connectionStatus').className = 'font-semibold text-red-400';
+        document.getElementById('connectionStatus').textContent = 'CONNECTION LOST';
+        document.getElementById('connectionStatus').className = 'text-sm font-semibold text-red-400';
+        document.getElementById('statusDot').className = 'h-3 w-3 rounded-full bg-red-500 status-glow';
       }
     }
 
+    // Initial load from history even if offline
+    renderHistory();
+    
+    // Start loop
     fetchData();
-    setInterval(fetchData, 5000);
+    setInterval(fetchData, REFRESH_RATE);
   </script>
 </body>
 </html>
