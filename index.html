@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Natasha OS | Debug Center</title>
+  <title>Natasha OS | Logic Debugger</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -20,22 +20,14 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: 20px;
     }
-    .status-pulse {
-      animation: pulse-green 2s infinite;
-    }
+    .status-pulse { animation: pulse-green 2s infinite; }
     @keyframes pulse-green {
       0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
       70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
       100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
     }
-    .debug-tag {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(56, 189, 248, 0.1);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.2);
-    }
+    .log-entry { border-left: 3px solid transparent; transition: all 0.2s; }
+    .log-entry:hover { border-left-color: #06b6d4; background: rgba(255,255,255,0.02); }
   </style>
 </head>
 <body class="p-4 lg:p-10">
@@ -45,75 +37,60 @@
       <div>
         <h1 class="text-4xl font-extrabold tracking-tighter text-white">NATASHA <span class="text-cyan-500 font-medium italic">OS</span></h1>
         <div class="flex items-center gap-2 mt-1">
-            <span class="debug-tag">IST ENFORCED</span>
-            <p class="text-slate-500 text-xs font-mono uppercase tracking-widest">Network Debugger & Logic Monitor</p>
+            <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/20 uppercase">IST Sync Active</span>
+            <p class="text-slate-500 text-xs font-mono uppercase tracking-widest">Interaction & Logic Monitor</p>
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-4">
-        <div class="glass-card px-5 py-3 flex items-center gap-4">
-          <div id="statusDot" class="h-2.5 w-2.5 rounded-full bg-green-500 status-pulse"></div>
-          <div>
-            <div class="text-[10px] text-slate-500 font-bold">ENGINE STATUS</div>
-            <div id="connectionStatus" class="text-xs font-bold text-green-400">OPERATIONAL</div>
-          </div>
+      <div class="glass-card px-5 py-3 flex items-center gap-4">
+        <div id="statusDot" class="h-2.5 w-2.5 rounded-full bg-green-500 status-pulse"></div>
+        <div class="pr-4 border-r border-white/10">
+          <div class="text-[10px] text-slate-500 font-bold uppercase">System</div>
+          <div id="connectionStatus" class="text-xs font-bold text-green-400 font-mono">LIVE</div>
         </div>
-        <div class="glass-card px-5 py-3 flex items-center gap-4">
-          <div class="text-right">
-            <div class="text-[10px] text-slate-500 font-bold">SESSION UPTIME</div>
-            <div id="sessionUptime" class="text-xs font-bold font-mono">00:00:00</div>
-          </div>
+        <div>
+          <div class="text-[10px] text-slate-500 font-bold uppercase">Local IST</div>
+          <div id="nodeClock" class="text-xs font-bold font-mono">--:--:--</div>
         </div>
       </div>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-      <div class="glass-card p-6 border-l-4 border-cyan-500">
-        <p class="text-slate-500 text-xs font-bold uppercase mb-2">Message Queue</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="glass-card p-6">
+        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Queue Depth</p>
         <div id="queueSize" class="text-4xl font-bold font-mono">0</div>
       </div>
-      <div class="glass-card p-6 border-l-4 border-purple-500">
-        <p class="text-slate-500 text-xs font-bold uppercase mb-2">Processing Latency</p>
+      <div class="glass-card p-6">
+        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Process Latency</p>
         <div class="flex items-baseline gap-2">
           <span id="lastDelay" class="text-4xl font-bold font-mono text-purple-400">--</span>
-          <span class="text-slate-600 text-sm">ms</span>
+          <span class="text-slate-600 text-xs font-mono">ms</span>
         </div>
       </div>
-      <div class="glass-card p-6 border-l-4 border-orange-500">
-        <p class="text-slate-500 text-xs font-bold uppercase mb-2">Next Auto-Trigger (IST)</p>
+      <div class="glass-card p-6">
+        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Next Trigger (IST)</p>
         <div id="nextCheck" class="text-3xl font-bold font-mono text-orange-400">--:--:--</div>
       </div>
-      <div class="glass-card p-6 border-l-4 border-green-500">
-        <p class="text-slate-500 text-xs font-bold uppercase mb-2">Local Node Clock</p>
-        <div id="nodeClock" class="text-3xl font-bold font-mono">--:--:--</div>
+      <div class="glass-card p-6">
+        <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Total Interactions</p>
+        <div id="totalInteractions" class="text-3xl font-bold font-mono text-green-400">0</div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="lg:col-span-2 glass-card flex flex-col h-[650px]">
+      <div class="lg:col-span-2 glass-card flex flex-col h-[600px]">
         <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5 rounded-t-[20px]">
-          <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Transmission Log</h2>
-          <button onclick="clearHistory()" class="text-[10px] hover:text-red-400 transition text-slate-600 font-bold uppercase">Clear Cache</button>
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Transaction History (IST)</h2>
+          <span class="text-[10px] text-slate-600 font-mono">Cached for 60m</span>
         </div>
-        <div id="activityLog" class="flex-1 overflow-y-auto p-2 space-y-2">
+        <div id="activityLog" class="flex-1 overflow-y-auto p-2 space-y-1">
             </div>
       </div>
 
-      <div class="space-y-6">
-        <div class="glass-card p-6">
-          <h2 class="text-sm font-bold text-cyan-500 uppercase mb-6 tracking-widest border-b border-cyan-500/20 pb-2">Debug Inspector</h2>
-          <div id="liveInspector" class="space-y-6">
-             <div class="text-slate-600 italic text-sm text-center py-10">Listening for data packets...</div>
-          </div>
-        </div>
-
-        <div class="glass-card p-6 bg-cyan-500/5">
-            <h2 class="text-[10px] font-bold text-slate-500 uppercase mb-4">API Metadata</h2>
-            <div class="space-y-2 font-mono text-[11px]">
-                <div class="flex justify-between"><span class="text-slate-500">Node</span><span class="text-slate-300">OnRender-US-East</span></div>
-                <div class="flex justify-between"><span class="text-slate-500">Protoc</span><span class="text-slate-300">JSON/REST</span></div>
-                <div class="flex justify-between"><span class="text-slate-500">Refresh</span><span class="text-slate-300">5000ms</span></div>
-            </div>
+      <div class="glass-card p-6 overflow-y-auto h-[600px]">
+        <h2 class="text-xs font-bold text-cyan-500 uppercase mb-6 tracking-widest border-b border-cyan-500/20 pb-2">Packet Inspector</h2>
+        <div id="liveInspector" class="space-y-8">
+           <div class="text-slate-600 italic text-sm text-center py-20">Awaiting network handshake...</div>
         </div>
       </div>
     </div>
@@ -121,103 +98,105 @@
 
   <script>
     const API_URL = 'https://telethonbotapiconnected.onrender.com/status';
-    const startTime = Date.now();
-    let history = JSON.parse(localStorage.getItem('natasha_debug_history')) || [];
+    let history = JSON.parse(localStorage.getItem('natasha_v3_history')) || [];
+    let interactionCount = history.length;
 
-    function getISTTime(dateInput = new Date()) {
+    // Helper: Convert Server Time String to IST
+    function forceIST(timeStr) {
+      if (!timeStr || timeStr === "null") return "--:--:--";
+      
+      // If server sends "HH:MM:SS", we create a date object for today
+      const today = new Date().toLocaleDateString('en-ZA'); // YYYY/MM/DD format
+      const dateObj = new Date(`${today} ${timeStr}`);
+      
       return new Intl.DateTimeFormat('en-IN', {
         timeZone: 'Asia/Kolkata',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
         hour12: true
-      }).format(new Date(dateInput));
+      }).format(dateObj);
     }
 
-    function updateUptime() {
-      const diff = Math.floor((Date.now() - startTime) / 1000);
-      const h = String(Math.floor(diff / 3600)).padStart(2, '0');
-      const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-      const s = String(diff % 60).padStart(2, '0');
-      document.getElementById('sessionUptime').textContent = `${h}:${m}:${s}`;
-      document.getElementById('nodeClock').textContent = getISTTime();
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('nodeClock').textContent = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: true
+      }).format(now);
     }
 
-    function saveToHistory(data) {
+    function saveEvent(data) {
       const now = Date.now();
-      const msgId = data.last_received?.msg_id || 'N/A';
-      
-      // Prevent duplicates based on Message ID
-      if (history.length > 0 && history[0].msgId === msgId && msgId !== 'N/A') return;
+      const currentMsg = data.last_received?.text || 'Heartbeat';
+      const currentTime = data.last_received?.time || '';
+
+      // Avoid duplicate logs if time/text is same as last
+      if (history.length > 0 && history[0].text === currentMsg && history[0].rawTime === currentTime) return;
 
       history.unshift({
         recordedAt: now,
-        msgId: msgId,
-        sender: data.last_received?.sender_name || 'SYSTEM',
-        text: data.last_received?.text || 'Heartbeat signal',
-        fullData: data
+        rawTime: currentTime,
+        sender: data.last_received?.user || 'SYSTEM',
+        text: currentMsg,
+        type: data.last_reply?.reply ? 'REPLY' : (data.last_ignored?.reason ? 'IGNORED' : 'RECEIVE'),
+        fullData: JSON.parse(JSON.stringify(data))
       });
 
-      // Maintain 1-hour history limit
-      history = history.filter(item => (now - item.recordedAt) < 3600000);
-      if (history.length > 30) history.pop();
-
-      localStorage.setItem('natasha_debug_history', JSON.stringify(history));
+      if (history.length > 40) history.pop();
+      localStorage.setItem('natasha_v3_history', JSON.stringify(history));
+      interactionCount++;
+      document.getElementById('totalInteractions').textContent = interactionCount;
       renderHistory();
     }
 
     function renderHistory() {
       const container = document.getElementById('activityLog');
-      container.innerHTML = history.map(item => `
-        <div class="p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition">
-          <div class="flex justify-between items-start">
+      container.innerHTML = history.map((item, idx) => `
+        <div class="log-entry p-3 rounded-lg bg-white/[0.01] mb-1 flex justify-between items-center group">
+          <div class="flex items-center gap-4">
+            <div class="w-2 h-2 rounded-full ${item.type === 'REPLY' ? 'bg-green-500' : item.type === 'IGNORED' ? 'bg-orange-500' : 'bg-cyan-500'}"></div>
             <div>
-              <span class="text-[10px] font-mono text-cyan-400 mr-2 uppercase tracking-tighter">ID: ${item.msgId}</span>
-              <span class="text-xs font-bold text-slate-200">${item.sender}</span>
+              <div class="text-[10px] font-mono text-slate-500 uppercase">${item.type} | ID: ${item.sender}</div>
+              <div class="text-sm text-slate-300 font-medium">${item.text}</div>
             </div>
-            <span class="text-[10px] font-mono text-slate-500">${getISTTime(item.recordedAt)}</span>
           </div>
-          <p class="text-sm text-slate-400 mt-1 line-clamp-1 font-mono">${item.text}</p>
+          <div class="text-[10px] font-mono text-slate-600">${forceIST(item.rawTime)}</div>
         </div>
       `).join('');
     }
 
     function updateInspector(data) {
       const container = document.getElementById('liveInspector');
-      
-      const debugRow = (label, val, color = 'text-slate-300') => `
-        <div class="flex justify-between py-1.5 border-b border-white/5 font-mono text-[12px]">
+      const row = (label, val, color = "text-slate-300") => `
+        <div class="flex justify-between py-1 border-b border-white/5 font-mono text-[11px]">
           <span class="text-slate-500">${label}</span>
-          <span class="${color} break-all ml-4 text-right">${val || '---'}</span>
-        </div>
-      `;
+          <span class="${color} text-right ml-4">${val || '---'}</span>
+        </div>`;
 
       container.innerHTML = `
-        <div>
-          <h3 class="text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Received Packet</h3>
-          ${debugRow('Msg ID', data.last_received?.msg_id, 'text-cyan-400')}
-          ${debugRow('Peer ID', data.last_received?.chat_id)}
-          ${debugRow('Sender', data.last_received?.sender_name)}
-          ${debugRow('Content', data.last_received?.text)}
-        </div>
-        <div>
-          <h3 class="text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Outbound Reply</h3>
-          ${debugRow('Target ID', data.last_reply?.peer_id)}
-          ${debugRow('Response', data.last_reply?.text, 'text-green-400')}
-        </div>
-        <div>
-          <h3 class="text-[11px] font-bold text-slate-500 mb-2 uppercase tracking-widest">Logic Filter</h3>
-          ${debugRow('Reason', data.last_ignored?.reason, 'text-orange-400')}
-          ${debugRow('Ignored Msg', data.last_ignored?.text)}
-        </div>
-      `;
-    }
+        <section>
+          <h3 class="text-[10px] font-bold text-cyan-500 uppercase mb-3">Incoming Message</h3>
+          ${row('User ID', data.last_received?.user)}
+          ${row('Content', data.last_received?.text, 'text-white')}
+          ${row('Server Time', data.last_received?.time)}
+          ${row('IST Local', forceIST(data.last_received?.time), 'text-cyan-400')}
+        </section>
 
-    function clearHistory() {
-      history = [];
-      localStorage.removeItem('natasha_debug_history');
-      renderHistory();
-      location.reload();
+        <section>
+          <h3 class="text-[10px] font-bold text-green-500 uppercase mb-3">Bot Interaction (Reply)</h3>
+          ${row('Trigger', data.last_reply?.original)}
+          ${row('Response', data.last_reply?.reply, 'text-green-400')}
+          ${row('Internal Delay', data.last_reply?.delay + 's')}
+          ${row('Sent At (IST)', forceIST(data.last_reply?.time), 'text-green-400')}
+        </section>
+
+        <section>
+          <h3 class="text-[10px] font-bold text-orange-500 uppercase mb-3">Filter Logic (Ignored)</h3>
+          ${row('Reason', data.last_ignored?.reason, 'text-orange-400')}
+          ${row('Text', data.last_ignored?.text)}
+          ${row('Time (IST)', forceIST(data.last_ignored?.time))}
+        </section>
+      `;
     }
 
     async function fetchData() {
@@ -225,29 +204,25 @@
         const res = await fetch(`${API_URL}?t=${Date.now()}`);
         const data = await res.json();
 
-        // Update UI Components
+        // Update Global Stats
         document.getElementById('queueSize').textContent = data.queue_size ?? 0;
         document.getElementById('lastDelay').textContent = data.last_delay ?? '--';
-        
-        // Ensure Next Check is shown in IST if it's a string from server
-        // If server sends relative time, we calculate it here
-        document.getElementById('nextCheck').textContent = data.next_random_group_check || '--:--:--';
+        document.getElementById('nextCheck').textContent = forceIST(data.next_random_group_check);
 
-        saveToHistory(data);
+        saveEvent(data);
         updateInspector(data);
 
-        document.getElementById('connectionStatus').textContent = 'OPERATIONAL';
-        document.getElementById('statusDot').classList.replace('bg-red-500', 'bg-green-500');
+        document.getElementById('connectionStatus').textContent = 'LIVE';
+        document.getElementById('statusDot').className = 'h-2.5 w-2.5 rounded-full bg-green-500 status-pulse';
       } catch (err) {
-        document.getElementById('connectionStatus').textContent = 'LINK SEVERED';
-        document.getElementById('statusDot').classList.replace('bg-green-500', 'bg-red-500');
+        document.getElementById('connectionStatus').textContent = 'OFFLINE';
+        document.getElementById('statusDot').className = 'h-2.5 w-2.5 rounded-full bg-red-500';
       }
     }
 
-    // Refresh loops
-    setInterval(updateUptime, 1000);
+    setInterval(updateClock, 1000);
     setInterval(fetchData, 5000);
-    fetchData(); // Initial call
+    fetchData();
   </script>
 </body>
 </html>
